@@ -161,22 +161,11 @@ def get_breakdown_age(chart_id: str, url: str) -> Tuple[List, List]:
     if keys != ['Age Category', 'POPULATION', 'Cases', 'Hospitalizations', 'Deaths']:
         raise ValueError('The headers have changed')
 
-    key_mapping = {"0-9": "0_to_9", "10-18": "10_to_18", "19-34": "19_to_34", "35-49": "35_to_49", "50-64": "50_to_64", "65-79": "65_to_79", "80-94": "80_to_94", "95+": "95_and_older"}
-
     for row in csv_reader:
-        c_age: dict = dict()
-        d_age: dict = dict()
-         # Extracting the age group and the raw count for both cases and deaths.
-        c_age["group"], d_age["group"] = row['Age Category'], row['Age Category']
-        if c_age["group"] not in key_mapping:
-            raise ValueError(str(c_age["group"]) + ' is not in the list of age groups. The age groups have changed.')
-        else:
-            c_age["group"] = key_mapping[c_age["group"]]
-            c_age["raw_count"] = int(row["Cases"])
-            d_age["group"] = key_mapping[d_age["group"]]
-            d_age["raw_count"] = int(row["Deaths"])
-            c_brkdown.append(c_age)
-            d_brkdown.append(d_age)
+        c_age = {"group": row['Age Category'], "count": int(row["Cases"])}
+        d_age = {"group": row['Age Category'], "count": int(row["Deaths"])}
+        c_brkdown.append(c_age)
+        d_brkdown.append(d_age)
 
     return c_brkdown, d_brkdown
 
