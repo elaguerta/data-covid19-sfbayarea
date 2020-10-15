@@ -162,8 +162,9 @@ def get_breakdown_age(chart_id: str, url: str) -> Tuple[List, List]:
         raise ValueError('The headers have changed')
 
     for row in csv_reader:
-        c_age = {"group": row['Age Category'], "count": int(row["Cases"])}
-        d_age = {"group": row['Age Category'], "count": int(row["Deaths"])}
+        age_group = row['Age Category']
+        c_age = {"group": age_group, "count": int(row["Cases"])}
+        d_age = {"group": age_group, "count": int(row["Deaths"])}
         c_brkdown.append(c_age)
         d_brkdown.append(d_age)
 
@@ -179,16 +180,13 @@ def get_breakdown_gender(chart_id: str, url: str) -> Tuple[Dict, Dict]:
     if keys != ['Gender', 'POPULATION', 'Cases', 'Hospitalizations', 'Deaths']:
         raise ValueError('The headers have changed.')
 
-    genders = ['male', 'female']
     c_gender: dict = dict()
     d_gender: dict = dict()
 
     for row in csv_reader:
         # Extracting the gender and the raw count (the 3rd and 5th columns, respectively) for both cases and deaths.
         # Each new row has data for a different gender.
-        gender = row["Gender"].lower()
-        if gender not in genders:
-            raise ValueError("The genders have changed.")
+        gender = row["Gender"]
         c_gender[gender] = int(row["Cases"])
         d_gender[gender] = int(row["Deaths"])
 
@@ -205,18 +203,13 @@ def get_breakdown_race_eth(chart_id: str, url: str) -> Tuple[Dict, Dict]:
     if keys != ['Race/Ethnicity', 'COUNTY POPULATION', 'Cases', 'Case Percent', 'Hospitalizations', 'Hospitalizations Percent', 'Deaths', 'Deaths Percent']:
         raise ValueError("The headers have changed.")
 
-    key_mapping = {"Black/African American":"African_Amer", "Hispanic/Latino": "Latinx_or_Hispanic", "White": "White", "Asian": "Asian", "Native Hawaiian/Pacific Islander": "Pacific_Islander", "American Indian/Alaska Native": "Native_Amer", "Multi or Other Race": "Multi_or_Other"}
-
     c_race_eth: dict = dict()
     d_race_eth: dict = dict()
 
     for row in csv_reader:
         race_eth = row["Race/Ethnicity"]
-        if race_eth not in key_mapping:
-            raise ValueError("The race_eth groups have changed.")
-        else:
-            c_race_eth[key_mapping[race_eth]] = int(row["Cases"])
-            d_race_eth[key_mapping[race_eth]] = int(row["Deaths"])
+        c_race_eth[race_eth] = int(row["Cases"])
+        d_race_eth[race_eth] = int(row["Deaths"])
 
     return c_race_eth, d_race_eth
 
