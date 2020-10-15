@@ -223,12 +223,12 @@ def get_age_table(out: Dict) -> None:
     # Format the results.
     age_group_cases = [{
                         'group': entry['attributes']['Age_group'],
-                        'raw_count': entry['attributes']['AG_Total_cases']
+                        'count': entry['attributes']['AG_Total_cases']
                        }
                        for entry in parsed2['features']]
     age_group_deaths = [{
                          'group': entry['attributes']['Age_group'],
-                         'raw_count': entry['attributes']['AG_deaths']
+                         'count': entry['attributes']['AG_deaths']
                         }
                         for entry in parsed2['features']]
 
@@ -272,7 +272,7 @@ def get_gender_table(out: Dict) -> None:
     response2.raise_for_status()
     parsed2 = response2.json()
 
-    gender_cases = {entry['attributes']['Gender'].lower(): entry['attributes']['G_Total_cases']
+    gender_cases = {entry['attributes']['Gender']: entry['attributes']['G_Total_cases']
                     for entry in parsed2['features']}
 
     # A complete table will have at least 2 datapoints, as of 9/18/20. If were
