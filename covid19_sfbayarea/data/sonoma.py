@@ -155,13 +155,10 @@ def transform_gender(tag: element.Tag) -> Dict[str, int]:
     """
     genders = {}
     rows = parse_table(tag)
-    gender_string_conversions = {'Males': 'male', 'Females': 'female'}
     for row in rows:
         gender = row['Gender']
         cases = parse_int(row['Cases'])
-        if gender not in gender_string_conversions:
-            raise FormatError('An unrecognized gender has been added to the gender table')
-        genders[gender_string_conversions[gender]] = cases
+        genders[gender] = cases
     return genders
 
 def transform_age(tag: element.Tag) -> TimeSeries:
@@ -175,7 +172,7 @@ def transform_age(tag: element.Tag) -> TimeSeries:
     for row in rows:
         raw_count = parse_int(row['Cases'])
         group = row['Age Group']
-        element: TimeSeriesItem = {'group': group, 'raw_count': raw_count}
+        element: TimeSeriesItem = {'group': group, 'count': raw_count}
         categories.append(element)
     return categories
 
@@ -185,16 +182,9 @@ def transform_race_eth(race_eth_tag: element.Tag) -> Dict[str, int]:
     transforms it into an object of form:
     'race_eth': {'Asian': -1, 'Latinx_or_Hispanic': -1, 'Other': -1, 'White':-1, 'Unknown': -1}
     """
-    race_cases = {
-        'Asian': 0,
-        'Latinx_or_Hispanic': 0,
-        'Other': 0,
-        'White': 0,
-        'Unknown': 0,
-        'Multiple_Race': 0,
-        'African_Amer': 0,
-    }
 
+    # deprecated mapping from county's group to our internal names
+    # this has been retained so that we can check if the group names have changed
     race_transform = {
         'Asian / Pacific Islander, non-Hispanic': 'Asian',
         'Hispanic / Latino': 'Latinx_or_Hispanic',
@@ -205,14 +195,15 @@ def transform_race_eth(race_eth_tag: element.Tag) -> Dict[str, int]:
         'Unknown': 'Unknown'
     }
 
+    race_cases = dict()
+
     rows = parse_table(race_eth_tag)
     for row in rows:
         group_name = row['Race/Ethnicity']
         cases = parse_int(row['Cases'])
         if group_name not in race_transform:
             raise FormatError('The racial group {0} is new in the data -- please adjust the scraper accordingly')
-        internal_name = race_transform[group_name]
-        race_cases[internal_name] = cases
+        race_cases[group_name] = cases
     return race_cases
 
 def get_table_tags(soup: BeautifulSoup) -> List[element.Tag]:

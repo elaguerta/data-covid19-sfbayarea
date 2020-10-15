@@ -10,4 +10,4 @@ class CasesByGender(PowerBiQuerier):
 
     def _parse_data(self, response_json: Dict[str, List]) -> Dict[str, int]:
         results = super()._parse_data(response_json)
-        return { gender.lower(): count for gender, count in results }
+        return { gender: count for gender, count in results }
